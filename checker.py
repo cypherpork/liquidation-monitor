@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from configparser import ConfigParser
+from subprocess import Popen, PIPE
 
 base_path = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.join(base_path, "config.conf")
@@ -21,6 +22,13 @@ else:
 
 show_help_list = cfg.getboolean("main", "show_help_list")
 send_to_info_if_not_alerts = cfg.getboolean("main", "send_to_info_if_not_alerts")
+lpv = cfg.get("main", "liquid_price_value")
+
+user = cfg.get("twinkle", "user")
+if user == "" :
+	user = "makermon"
+
+account = cfg.get("twinkle", "account")
 
 url = cfg.get("web", "url")
 wait = cfg.getfloat("web", "wait")
@@ -47,6 +55,19 @@ def send(sub, text):
 	server.sendmail(sender, receivers, message.as_string())
 	server.quit()
 
+def callTwinkle(user, account)
+	proc = Popen(["twinkle", "-c"], stdin=PIPE, stdout=PIPE, bufsize=1)
+	for line in iter(proc.stdout.readline, b''):
+		print line
+		if ("registration succeeded" in line):
+ 			proc.stdin.write("user "+user+"\n")
+			proc.stdin.write("call "+account+"\n")
+			if ("far end answered call" in line):
+ 				proc.stdin.write("bye\n")
+				proc.stdin.write("quit\n")
+			if ("reject" in line):
+				proc.stdin.write("quit\n")
+	proc.communicate()
 
 options = Options()
 options.set_headless()
@@ -70,7 +91,10 @@ if show_help_list:
 		i += 1
 
 # Liquidation Price value:
-liquid_price_value = items.text.split("\n")[14]
+if lpv == "" :
+	liquid_price_value = items.text.split("\n")[14]
+else:
+	liquid_price_value = lpv
 
 # Current Price
 cur_price_value = items.text.split("\n")[19]
@@ -85,7 +109,9 @@ print(data)
 
 if next_price_value.replace(',','').replace('$','') < liquid_price_value.replace(',','').replace('$','') :
 	print("important alert!!!")
-	send("important alert!!!", "The liquidation price is greater than the next price\r\n"+data+"\r\n")
+	send("important alert!!!", "Your alert price is greater than the next price\r\n"+data+"\r\n")
+	if account != "" :
+		callTwinkle(user, account)
 else:
 	print("no alerts...")
 	if send_to_info_if_not_alerts:

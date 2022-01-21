@@ -1,4 +1,4 @@
-# oasis-emitter
+# liquidation-monitor
 You can create events tracking price changes for the currency you are interested in on **oassis.com** and other similar sites
 
 ### installing dependencies:
@@ -22,7 +22,7 @@ create crontab config file:
 
 Add the check period you need:
 
-```*/5 * * * * python /path/to/directory/scrpt/oasis-emitter/checker.py > /dev/null 2>&1```
+```*/5 * * * * python /path/to/directory/scrpt/liquidation-monitor/checker.py > /dev/null 2>&1```
 
 here i have set run every 5 minutes
 

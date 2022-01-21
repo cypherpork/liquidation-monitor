@@ -1,0 +1,1 @@
+25 * * * * /home/parallels/liquidation-monitor/mm-cron.sh >> /home/parallels/liquidation-monitor/cron.log 2&>1 
